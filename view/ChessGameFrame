@@ -1,0 +1,200 @@
+package view;
+
+import controller.GameController;
+import model.ChessColor;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.Timer;
+import java.util.Date;
+import java.util.TimerTask;
+
+/**
+ * 这个类表示游戏过程中的整个游戏界面，是一切的载体
+ */
+public class ChessGameFrame extends JFrame {
+    //    public final Dimension FRAME_SIZE ;
+    private final int WIDTH;
+    private final int HEIGTH;
+    public final int CHESSBOARD_SIZE;
+    private GameController gameController;
+    public static JLabel xingqifang;
+    private JLabel logLabel;
+    JLabel time = new JLabel("31s left");
+    public static int time0 = 31;
+
+    public ChessGameFrame(int width, int height) {
+        setTitle("2022 CS102A Project Demo"); //设置标题
+        this.WIDTH = width;
+        this.HEIGTH = height;
+        this.CHESSBOARD_SIZE = HEIGTH * 4 / 5;
+
+        setSize(WIDTH, HEIGTH);
+        setLocationRelativeTo(null); // Center the window.
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); //设置程序关闭按键，如果点击右上方的叉就游戏全部关闭了
+        setLayout(null);
+
+        xingqifang = new JLabel("BLACK's turn");
+        xingqifang.setLocation(HEIGTH, HEIGTH / 10);
+        xingqifang.setSize(200, 60);
+        xingqifang.setFont(new Font("Rockwell", Font.BOLD, 20));
+
+        logLabel = new JLabel();
+        logLabel.setSize(500, 40);
+        logLabel.setLocation(HEIGTH, HEIGTH / 10);
+
+        Chessboard chessboard = new Chessboard(CHESSBOARD_SIZE, CHESSBOARD_SIZE);
+        gameController = new GameController(chessboard);
+        chessboard.setLocation(HEIGTH / 10, HEIGTH / 10);
+        add(chessboard);
+
+        time.setLocation(HEIGTH, HEIGTH / 10 + 50);
+        time.setSize(200, 60);
+        time.setFont(new Font("31s", Font.BOLD, 20));
+
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                time0--;
+                String t = String.valueOf(time0) + "s left";
+                changetime(t);
+                if (time0 == 0) {
+                    JOptionPane.showMessageDialog(chessboard, "You timed out!");
+                    time0 = 31;
+                    for (int i = 0; i < 8; i++) {
+                        for (int j = 0; j < 8; j++) {
+                            chessboard.getChessComponents()[i][j].setSelected(false);
+                            chessboard.getChessComponents()[i][j].repaint();
+                        }
+                    }
+
+                    chessboard.getClickController().setFirst(null);
+                    if (chessboard.getCurrentColor().equals(ChessColor.BLACK)) {
+                        chessboard.setCurrentColor(ChessColor.WHITE);
+                    } else {
+                        chessboard.setCurrentColor(ChessColor.BLACK);
+                    }
+                    if (chessboard.getCurrentColor().equals(ChessColor.BLACK)) {
+                        ChessGameFrame.xingqifang.setText("BLACK's turn");
+                    } else {
+                        ChessGameFrame.xingqifang.setText("WHITE's turn");
+                    }
+                }
+            }
+        };
+        timer.schedule(task, 1000, 1000);
+
+
+        add(time);
+        add(xingqifang);
+        addHelloButton();
+        addLoadButton();
+        addSaveButton();
+        addBackground();
+        add(logLabel);
+    }
+
+    public void changetime(String t) {
+        time.setText(t);
+    }
+
+    private void addBackground() {
+        ImageIcon img = new ImageIcon("./images/background.jpg");
+        JLabel back = new JLabel((img));
+        back.setBounds(0, 0, this.getWidth(), this.getHeight());
+        add(back);
+    }
+
+    /**
+     * 在游戏面板中添加棋盘
+     */
+//    private void addChessboard() {
+//        Chessboard chessboard = new Chessboard(CHESSBOARD_SIZE, CHESSBOARD_SIZE);
+//        gameController = new GameController(chessboard);
+//        chessboard.setLocation(HEIGTH / 10, HEIGTH / 10);
+//        add(chessboard);
+//    }
+
+    /**
+     * 在游戏面板中添加标签
+     */
+    private void addLabel() {
+        JLabel statusLabel = new JLabel("BLACK‘s turn");
+        statusLabel.setLocation(HEIGTH, HEIGTH / 10);
+        statusLabel.setSize(200, 60);
+        statusLabel.setFont(new Font("Rockwell", Font.BOLD, 20));
+        add(statusLabel);
+    }
+
+    /**
+     * 在游戏面板中增加一个按钮，如果按下的话就会显示Hello, world!
+     */
+
+    private void addHelloButton() {
+        JButton button = new JButton("New Start");
+        button.addActionListener((e) -> JOptionPane.showMessageDialog(this, "Welcome to a new game!"));
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                ChessGameFrame chessGameFrame = new ChessGameFrame(1000, 760);
+
+                chessGameFrame.setVisible(true);
+            }
+        });
+        button.setLocation(HEIGTH, HEIGTH / 10 + 120);
+        button.setSize(200, 60);
+        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        add(button);
+    }
+
+    private void addLoadButton() {
+        JButton button = new JButton("Load");
+        button.setLocation(HEIGTH, HEIGTH / 10 + 240);
+        button.setSize(200, 60);
+        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        add(button);
+
+        button.addActionListener(e -> {
+            System.out.println("Click load");
+            String path = JOptionPane.showInputDialog(this, "Input Path here");
+            gameController.loadGameFromFile(path);
+        });
+    }
+
+    private void addSaveButton() {
+        JButton button = new JButton("Save");
+        button.setLocation(HEIGTH, HEIGTH / 10 + 480);
+        button.setSize(200, 60);
+        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        add(button);
+
+        button.addActionListener(e -> {
+
+
+            printLog("clicked Save Btn");
+            String filePath = JOptionPane.showInputDialog(this, "input the path here");
+            if (filePath == null || filePath.isEmpty()) {
+                return;
+            }
+            if (!filePath.endsWith(".txt")) {
+                filePath += ".txt";
+            }
+            gameController.writeDataToFile(filePath);
+            JOptionPane.showMessageDialog(this, "Archive saved successfully", "Tips", JOptionPane.WARNING_MESSAGE);
+        });
+    }
+
+    public void printLog(String msg) {
+        logLabel.setText(msg);
+    }
+
+}
