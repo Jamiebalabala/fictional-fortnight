@@ -1,0 +1,92 @@
+package view;
+
+import controller.GameController;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+
+public class MainFrame extends JFrame {
+    private final int WIDTH;
+    private final int HEIGTH;
+
+    public MainFrame(int width, int heigth) {
+        setTitle("Welcome to the chess game!");
+        WIDTH = width;
+        HEIGTH = heigth;
+
+        setSize(WIDTH, HEIGTH);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setLayout(null);
+
+        playMusic();
+        addLabel();
+        addBackground();
+        addButton();
+    }
+
+    static Clip clip;
+    public static void playMusic() {
+        try
+        {
+            File musicPath = new File("./music/Monki.wav");
+
+            if(musicPath.exists())
+            {
+                AudioInputStream audioInput = AudioSystem.getAudioInputStream(musicPath);
+                clip = AudioSystem.getClip();
+                clip.open(audioInput);
+                FloatControl gainControl = (FloatControl)clip.getControl(FloatControl.Type.MASTER_GAIN);
+                gainControl.setValue(-30.0f);
+                clip.start();
+                clip.loop(Clip.LOOP_CONTINUOUSLY);
+            }
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+
+    }
+
+    private void addLabel() {
+        JLabel statusLabel = new JLabel("CHESS");
+        statusLabel.setText("CHESS");
+        statusLabel.setLocation(400, 100);
+        statusLabel.setSize(400, 300);
+        statusLabel.setFont(new Font("Rockwell", Font.BOLD, 60));
+        add(statusLabel);
+    }
+
+    private void addButton() {
+        JButton button = new JButton("Enter the Game");
+        button.addActionListener((e) -> JOptionPane.showMessageDialog(this, "Welcome to a new game!"));
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                ChessGameFrame chessGameFrame = new ChessGameFrame(1000, 760);
+                chessGameFrame.setVisible(true);
+            }
+        });
+        button.setLocation(350, 350);
+        button.setSize(300, 100);
+        button.setFont(new Font("Rockwell", Font.BOLD, 30));
+        add(button);
+    }
+
+    private void addBackground() {
+        ImageIcon img = new ImageIcon("./images/background.jpg");
+        JLabel back = new JLabel((img));
+        back.setBounds(0, 0, this.getWidth(), this.getHeight());
+        add(back);
+    }
+}
+
