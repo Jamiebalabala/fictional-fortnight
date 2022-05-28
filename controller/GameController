@@ -1,0 +1,55 @@
+package controller;
+
+import view.Chessboard;
+
+import javax.swing.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
+public class GameController {
+    private Chessboard chessboard;
+
+    public Chessboard getChessboard() {
+        return chessboard;
+    }
+
+    public void setChessboard(Chessboard chessboard) {
+        this.chessboard = chessboard;
+    }
+
+    public GameController(Chessboard chessboard) {
+        this.chessboard = chessboard;
+    }
+
+    public List<String> loadGameFromFile(String path) {
+        try {
+            if (!path.substring(path.length() - 3).equals("txt")) {
+                JOptionPane.showMessageDialog(chessboard, "Error in file format", "Tips", JOptionPane.WARNING_MESSAGE);
+
+            } else {
+                List<String> chessData = Files.readAllLines(Path.of(path));
+                chessboard.loadGame(chessData);
+                return chessData;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void writeDataToFile(String fileName) {
+        //todo: write data into file
+        try {
+            BufferedWriter wr = new BufferedWriter(new FileWriter(fileName));
+            wr.write(chessboard.getChessboardGraph());
+            System.out.println(chessboard.getChessboardGraph());
+            wr.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
