@@ -1,0 +1,143 @@
+package model;
+
+import view.ChessboardPoint;
+import controller.ClickController;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class BishopChessComponent extends ChessComponent {
+
+    private static Image BISHOP_WHITE;
+    private static Image BISHOP_BLACK;
+    private Image bishopImage;
+
+    public BishopChessComponent(ChessboardPoint chessboardPoint, Point location, ChessColor color, ClickController listener, int size, char name) {
+        super(chessboardPoint, location, color, listener, size, name);
+        initiateBishopImage(color);
+    }
+
+    @Override
+    public void loadResource() throws IOException {
+        if (BISHOP_WHITE == null) {
+            BISHOP_WHITE = ImageIO.read(new File("./images/bishop-white.png"));
+        }
+
+        if (BISHOP_BLACK == null) {
+            BISHOP_BLACK = ImageIO.read(new File("./images/bishop-black.png"));
+        }
+    }
+
+    private void initiateBishopImage(ChessColor color) {
+        try {
+            loadResource();
+            if (color == ChessColor.WHITE) {
+                bishopImage = BISHOP_WHITE;
+            } else if (color == ChessColor.BLACK) {
+                bishopImage = BISHOP_BLACK;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public boolean canMoveTo(ChessComponent[][] chessComponents, ChessboardPoint destination) {
+        ChessboardPoint source = getChessboardPoint();
+        double a = Math.signum(destination.getX() - source.getX());
+        double b = Math.signum(destination.getY() - source.getY());
+
+
+        if (Math.abs(destination.getX() - source.getX()) != Math.abs(destination.getY() - source.getY())) {
+            return false;
+        }
+        for (int i = 1; i < Math.abs(destination.getX() - source.getX()); i++) {
+            if (!(chessComponents[(int) (source.getX() + a * i)][(int) (source.getY() + b * i)] instanceof EmptySlotComponent)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public List<ChessboardPoint> cMoveTo(ChessComponent[][] chessboard) {
+        List<ChessboardPoint> cs = new ArrayList<>();
+        int min1 = Math.min(this.getChessboardPoint().getX(), 7 - this.getChessboardPoint().getY());
+        int min2 = Math.min(this.getChessboardPoint().getX(), this.getChessboardPoint().getY());
+        int min3 = Math.min(7 - this.getChessboardPoint().getX(), this.getChessboardPoint().getY());
+        int min4 = Math.min(7 - this.getChessboardPoint().getX(), 7 - this.getChessboardPoint().getY());
+
+        for (int i = 1; i <= min1; i++) {
+            if (chessboard[this.getChessboardPoint().getX() - i][this.getChessboardPoint().getY() + i].getChessColor().equals(ChessColor.NONE)) {
+                cs.add(this.getChessboardPoint().offset(-i, i));
+                continue;
+            }
+            if (chessboard[this.getChessboardPoint().getX() - i][this.getChessboardPoint().getY() + i].getChessColor().equals(this.getChessColor())) {
+                break;
+            } else {
+                cs.add(this.getChessboardPoint().offset(-i, i));
+                break;
+            }
+        }
+
+        for (int i = 1; i <= min2; i++) {
+            if (chessboard[this.getChessboardPoint().getX() - i][this.getChessboardPoint().getY() - i].getChessColor().equals(ChessColor.NONE)) {
+                cs.add(this.getChessboardPoint().offset(-i, -i));
+                continue;
+            }
+            if (chessboard[this.getChessboardPoint().getX() - i][this.getChessboardPoint().getY() - i].getChessColor().equals(this.getChessColor())) {
+                break;
+            } else {
+                cs.add(this.getChessboardPoint().offset(-i, -i));
+                break;
+            }
+        }
+
+        for (int i = 1; i <= min3; i++) {
+            if (chessboard[this.getChessboardPoint().getX() + i][this.getChessboardPoint().getY() - i].getChessColor().equals(ChessColor.NONE)) {
+                cs.add(this.getChessboardPoint().offset(i, -i));
+                continue;
+            }
+            if (chessboard[this.getChessboardPoint().getX() + i][this.getChessboardPoint().getY() - i].getChessColor().equals(this.getChessColor())) {
+                break;
+            } else {
+                cs.add(this.getChessboardPoint().offset(i, -i));
+                break;
+            }
+        }
+
+        for (int i = 1; i <= min4; i++) {
+            if (chessboard[this.getChessboardPoint().getX() + i][this.getChessboardPoint().getY() + i].getChessColor().equals(ChessColor.NONE)) {
+                cs.add(this.getChessboardPoint().offset(i, i));
+                continue;
+            }
+            if (chessboard[this.getChessboardPoint().getX() + i][this.getChessboardPoint().getY() + i].getChessColor().equals(this.getChessColor())) {
+                break;
+            } else {
+                cs.add(this.getChessboardPoint().offset(i, i));
+                break;
+            }
+        }
+        return cs;
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+//        g.drawImage(rookImage, 0, 0, getWidth() - 13, getHeight() - 20, this);
+        g.drawImage(bishopImage, 0, 0, getWidth(), getHeight(), this);
+        g.setColor(Color.BLACK);
+        if (isSelected()) {
+            g.setColor(Color.RED);
+            g.drawOval(0, 0, getWidth(), getHeight());
+        }
+    }
+}
+
+
+
