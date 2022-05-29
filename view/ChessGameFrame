@@ -2,6 +2,7 @@ package view;
 
 import controller.GameController;
 import model.ChessColor;
+import model.ChessComponent;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -77,6 +78,12 @@ public class ChessGameFrame extends JFrame {
                     }
 
                     chessboard.getClickController().setFirst(null);
+                    ChessComponent.setBackgroundColors(new Color[]{Color.PINK, Color.getHSBColor(124,248,120)});
+                    for (int i = 0; i < chessboard.getChessComponents().length; i ++){
+                        for (int j =0; j < chessboard.getChessComponents()[i].length;j++){
+                                chessboard.getChessComponents()[i][j].repaint();
+                        }
+                    }
                     if (chessboard.getCurrentColor().equals(ChessColor.BLACK)) {
                         chessboard.setCurrentColor(ChessColor.WHITE);
                     } else {
