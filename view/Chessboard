@@ -106,7 +106,6 @@ public class Chessboard extends JComponent {
 
     public void putChessOnBoard(ChessComponent chessComponent) {
         int row = chessComponent.getChessboardPoint().getX(), col = chessComponent.getChessboardPoint().getY();
-
         if (chessComponents[row][col] != null) {
             remove(chessComponents[row][col]);
         }
@@ -170,7 +169,7 @@ public class Chessboard extends JComponent {
         currentColor = currentColor == ChessColor.BLACK ? ChessColor.WHITE : ChessColor.BLACK;
     }
 
-    private void initRookOnBoard(int row, int col, ChessColor color) {
+    public void initRookOnBoard(int row, int col, ChessColor color) {
         char name;
         if (color.equals(ChessColor.BLACK)) {
             name = 'R';
@@ -194,7 +193,7 @@ public class Chessboard extends JComponent {
         putChessOnBoard(chessComponent);
     }
 
-    private void initQueenOnBoard(int row, int col, ChessColor color) {
+    public void initQueenOnBoard(int row, int col, ChessColor color) {
         char name;
         if (color.equals(ChessColor.BLACK)) {
             name = 'Q';
@@ -206,7 +205,7 @@ public class Chessboard extends JComponent {
         putChessOnBoard(chessComponent);
     }
 
-    private void initKnightOnBoard(int row, int col, ChessColor color) {
+    public void initKnightOnBoard(int row, int col, ChessColor color) {
         char name;
         if (color.equals(ChessColor.BLACK)) {
             name = 'N';
@@ -218,7 +217,7 @@ public class Chessboard extends JComponent {
         putChessOnBoard(chessComponent);
     }
 
-    private void initBishopOnBoard(int row, int col, ChessColor color) {
+    public void initBishopOnBoard(int row, int col, ChessColor color) {
         char name;
         if (color.equals(ChessColor.BLACK)) {
             name = 'B';
@@ -250,7 +249,7 @@ public class Chessboard extends JComponent {
     }
 
 
-    private Point calculatePoint(int row, int col) {
+    public Point calculatePoint(int row, int col) {
         return new Point(col * CHESS_SIZE, row * CHESS_SIZE);
     }
 
@@ -386,4 +385,29 @@ public class Chessboard extends JComponent {
         return sb.toString();
     }
 
+    public void changePawn(ChessComponent another){
+        if (another instanceof PawnChessComponent && (another.getChessboardPoint().getX() == 0||another.getChessboardPoint().getX() ==8)){
+            String[] options = {"Knight", "Bishop", "Rook", "Queen"};
+            int k = JOptionPane.showOptionDialog(null, "Choose what chess component your pawn component will be",
+                    "Click a button",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+            int x = another.getChessboardPoint().getX();
+            int y = another.getChessboardPoint().getY();
+            ChessColor c = another.getChessColor();
+            another.setVisible(false);
+            if (k == 0){
+                initKnightOnBoard(x,y,c);
+            }
+            if (k == 1){
+                initBishopOnBoard(x,y,c);
+            }
+            if (k == 2){
+                initRookOnBoard(x,y,c);
+            }
+            if (k == 3){
+                initQueenOnBoard(x,y,c);
+            }
+            else initKnightOnBoard(x,y,c);
+        }
+    }
 }
