@@ -117,7 +117,6 @@ public abstract class ChessComponent extends JComponent {
     @Override
     protected void processMouseEvent(MouseEvent e) {
         super.processMouseEvent(e);
-        Graphics g = null;
         if (e.getID() == MouseEvent.MOUSE_PRESSED) {
             System.out.printf("Click [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
             clickController.onClick(this);
@@ -161,9 +160,9 @@ public abstract class ChessComponent extends JComponent {
             g.setColor(Color.LIGHT_GRAY);
             g.fillRect(0, 0, this.getWidth(), this.getHeight());
         }
-        else {
-            g.setColor(squareColor);
-            g.fillRect(0, 0, this.getWidth(), this.getHeight());
-        }
+//        else {
+//            g.setColor(squareColor);
+//            g.fillRect(0, 0, this.getWidth(), this.getHeight());
+//        }
     }
 }
