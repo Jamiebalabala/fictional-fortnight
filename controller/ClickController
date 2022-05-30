@@ -6,25 +6,33 @@ import model.ChessComponent;
 import model.KingChessComponent;
 import view.ChessGameFrame;
 import view.Chessboard;
-import view.ChessboardPoint;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 
 public class ClickController {
 
     private final Chessboard chessboard;
     private ChessComponent first;
+    protected ChessGameFrame g;
+
+    public ChessGameFrame getG() {
+        return g;
+    }
+
+    public void setG(ChessGameFrame g) {
+        this.g = g;
+    }
 
     public ClickController(Chessboard chessboard) {
         this.chessboard = chessboard;
-
     }
+
+
 
     public ChessComponent getFirst() {
         return first;
@@ -55,40 +63,17 @@ public class ClickController {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-                for (int i = 0; i < chessComponent.cMoveTo(chessboard.getChessComponents()).size(); i ++){
-                    ChessComponent.setBackgroundColors(new Color[]{Color.ORANGE, Color.orange});
-                    chessboard.getChessComponents()[chessComponent.cMoveTo(chessboard.getChessComponents()).get(i).getX()][chessComponent.cMoveTo(chessboard.getChessComponents()).get(i).getY()].repaint();
-                }
-
             }
         } else {
             if (first == chessComponent) { // 再次点击取消选取
                 chessComponent.setSelected(false);
                 ChessComponent recordFirst = first;
                 first = null;
-                ChessComponent.setBackgroundColors(new Color[]{Color.PINK, Color.getHSBColor(124,248,120)});
-                for (int i = 0; i < chessboard.getChessComponents().length; i ++){
-                    for (int j =0; j < chessboard.getChessComponents()[i].length;j++){
-                            chessboard.getChessComponents()[i][j].repaint();
-                    }
-                }
                 recordFirst.repaint();
             } else if (handleSecond(chessComponent)) {
                 //repaint in swap chess method.
                 chessboard.swapChessComponents(first, chessComponent);
                 chessboard.swapColor();
-                ChessComponent.setBackgroundColors(new Color[]{Color.PINK, Color.getHSBColor(124,248,120)});
-                for (int i = 0; i < chessboard.getChessComponents().length; i ++){
-                    for (int j =0; j < chessboard.getChessComponents()[i].length;j++){
-                        chessboard.getChessComponents()[i][j].repaint();
-                    }
-                }
-                chessboard.changePawn(first);
-                for (int i = 0; i < chessboard.getChessComponents().length; i ++){
-                    for (int j =0; j < chessboard.getChessComponents()[i].length;j++){
-                        chessboard.getChessComponents()[i][j].repaint();
-                    }
-                }
                 Clip clip;
                 try {
                     File musicPath = new File("./music/Move.wav");
@@ -108,8 +93,13 @@ public class ClickController {
                     if (chessComponent.getChessColor().equals(ChessColor.WHITE)) {
                         int result = JOptionPane.showConfirmDialog(chessboard, "WHITE WINS!\nDou you want to restart the game?", "Tips", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
                         if (result == JOptionPane.YES_OPTION) {
-                            ChessGameFrame chessGameFrame = new ChessGameFrame(1000, 760);
-                            chessGameFrame.setVisible(true);
+
+                            g.dispose();
+                            g = new ChessGameFrame(1000, 760);
+                            g.setVisible(true);
+//                            g.dispose();
+//                            ChessGameFrame chessGameFrame = new ChessGameFrame(1000, 760);
+//                            chessGameFrame.setVisible(true);
                         } else {
                             System.exit(0);
                         }
@@ -117,9 +107,9 @@ public class ClickController {
                     if (chessComponent.getChessColor().equals(ChessColor.BLACK)) {
                         int result = JOptionPane.showConfirmDialog(chessboard, "BLACK WINS!\nDou you want to restart the game?", "Tips", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
                         if (result == JOptionPane.YES_OPTION) {
-//之前的窗口删不掉
-                            ChessGameFrame chessGameFrame = new ChessGameFrame(1000, 760);
-                            chessGameFrame.setVisible(true);
+                            g.dispose();
+                            g = new ChessGameFrame(1000, 760);
+                            g.setVisible(true);
                         } else {
                             System.exit(0);
                         }
