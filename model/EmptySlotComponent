@@ -28,6 +28,11 @@ public class EmptySlotComponent extends ChessComponent {
     }
 
     @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+    }
+
+    @Override
     public List<ChessboardPoint> cMoveTo(ChessComponent[][] chessboard) {
         return new ArrayList<>();
     }
