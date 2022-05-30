@@ -443,4 +443,29 @@ public class Chessboard extends JComponent {
         return sb.toString();
     }
 
+    public void changePawn(ChessComponent another){
+        if (another instanceof PawnChessComponent && (another.getChessboardPoint().getX() == 0||another.getChessboardPoint().getX() ==8)){
+            String[] options = {"Knight", "Bishop", "Rook", "Queen"};
+            int k = JOptionPane.showOptionDialog(null, "Choose what chess component your pawn component will be",
+                    "Click a button",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+            int x = another.getChessboardPoint().getX();
+            int y = another.getChessboardPoint().getY();
+            ChessColor c = another.getChessColor();
+            remove(another);
+            chessComponents[x][y] = null;
+            if (k == 0){
+                initKnightOnBoard(x,y,c);
+            }
+            if (k == 1){
+                initBishopOnBoard(x,y,c);
+            }
+            if (k == 2){
+                initRookOnBoard(x,y,c);
+            }
+            if (k == 3){
+                initQueenOnBoard(x,y,c);
+            }
+        }
+    }
 }
