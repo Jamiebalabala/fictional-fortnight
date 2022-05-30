@@ -28,8 +28,46 @@ public class ChessGameFrame extends JFrame {
     private GameController gameController;
     public static JLabel xingqifang;
     private JLabel logLabel;
-    JLabel time = new JLabel("31s left");
+    static JLabel time = new JLabel("31s left");
     public static int time0 = 31;
+    public static Timer timer;
+    private Chessboard chessboard;
+    public TimerTask task = new TimerTask() {
+        @Override
+        public void run() {
+            time0--;
+            String t = String.valueOf(time0) + "s left";
+            changetime(t);
+            if (time0 == 0) {
+                JOptionPane.showMessageDialog(chessboard, "You timed out!");
+                time0 = 31;
+                for (int i = 0; i < 8; i++) {
+                    for (int j = 0; j < 8; j++) {
+                        chessboard.getChessComponents()[i][j].setSelected(false);
+                        chessboard.getChessComponents()[i][j].repaint();
+                    }
+                }
+
+                chessboard.getClickController().setFirst(null);
+                ChessComponent.setBackgroundColors(new Color[]{Color.PINK, Color.getHSBColor(124,248,120)});
+                for (int i = 0; i < chessboard.getChessComponents().length; i ++){
+                    for (int j =0; j < chessboard.getChessComponents()[i].length;j++){
+                        chessboard.getChessComponents()[i][j].repaint();
+                    }
+                }
+                if (chessboard.getCurrentColor().equals(ChessColor.BLACK)) {
+                    chessboard.setCurrentColor(ChessColor.WHITE);
+                } else {
+                    chessboard.setCurrentColor(ChessColor.BLACK);
+                }
+                if (chessboard.getCurrentColor().equals(ChessColor.BLACK)) {
+                    ChessGameFrame.xingqifang.setText("BLACK's turn");
+                } else {
+                    ChessGameFrame.xingqifang.setText("WHITE's turn");
+                }
+            }
+        }
+    };
 
     public ChessGameFrame(int width, int height) {
         setTitle("2022 CS102A Project Demo"); //设置标题
@@ -51,65 +89,39 @@ public class ChessGameFrame extends JFrame {
         logLabel.setSize(500, 40);
         logLabel.setLocation(HEIGTH, HEIGTH / 10);
 
-        Chessboard chessboard = new Chessboard(CHESSBOARD_SIZE, CHESSBOARD_SIZE);
+        chessboard = new Chessboard(608, 608, this);
         gameController = new GameController(chessboard);
         chessboard.setLocation(HEIGTH / 10, HEIGTH / 10);
         add(chessboard);
+
+        ChessComponent.setBackgroundColors(new Color[]{Color.PINK, Color.getHSBColor(124,248,120)});
+        for (int i = 0; i < chessboard.getChessComponents().length; i ++){
+            for (int j =0; j < chessboard.getChessComponents()[i].length;j++){
+                chessboard.getChessComponents()[i][j].repaint();
+            }
+        }
 
         time.setLocation(HEIGTH, HEIGTH / 10 + 50);
         time.setSize(200, 60);
         time.setFont(new Font("31s", Font.BOLD, 20));
 
-        Timer timer = new Timer();
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                time0--;
-                String t = String.valueOf(time0) + "s left";
-                changetime(t);
-                if (time0 == 0) {
-                    JOptionPane.showMessageDialog(chessboard, "You timed out!");
-                    time0 = 31;
-                    for (int i = 0; i < 8; i++) {
-                        for (int j = 0; j < 8; j++) {
-                            chessboard.getChessComponents()[i][j].setSelected(false);
-                            chessboard.getChessComponents()[i][j].repaint();
-                        }
-                    }
-
-                    chessboard.getClickController().setFirst(null);
-                    ChessComponent.setBackgroundColors(new Color[]{Color.PINK, Color.getHSBColor(124,248,120)});
-                    for (int i = 0; i < chessboard.getChessComponents().length; i ++){
-                        for (int j =0; j < chessboard.getChessComponents()[i].length;j++){
-                                chessboard.getChessComponents()[i][j].repaint();
-                        }
-                    }
-                    if (chessboard.getCurrentColor().equals(ChessColor.BLACK)) {
-                        chessboard.setCurrentColor(ChessColor.WHITE);
-                    } else {
-                        chessboard.setCurrentColor(ChessColor.BLACK);
-                    }
-                    if (chessboard.getCurrentColor().equals(ChessColor.BLACK)) {
-                        ChessGameFrame.xingqifang.setText("BLACK's turn");
-                    } else {
-                        ChessGameFrame.xingqifang.setText("WHITE's turn");
-                    }
-                }
-            }
-        };
-        timer.schedule(task, 1000, 1000);
+        if (timer == null) {
+            timer = new Timer();
+            timer.schedule(task, 0, 1000);
+        }
 
 
         add(time);
         add(xingqifang);
         addHelloButton();
+        addBackButton();
         addLoadButton();
         addSaveButton();
         addBackground();
         add(logLabel);
     }
 
-    public void changetime(String t) {
+    public static void changetime(String t) {
         time.setText(t);
     }
 
@@ -120,30 +132,6 @@ public class ChessGameFrame extends JFrame {
         add(back);
     }
 
-    /**
-     * 在游戏面板中添加棋盘
-     */
-//    private void addChessboard() {
-//        Chessboard chessboard = new Chessboard(CHESSBOARD_SIZE, CHESSBOARD_SIZE);
-//        gameController = new GameController(chessboard);
-//        chessboard.setLocation(HEIGTH / 10, HEIGTH / 10);
-//        add(chessboard);
-//    }
-
-    /**
-     * 在游戏面板中添加标签
-     */
-    private void addLabel() {
-        JLabel statusLabel = new JLabel("BLACK‘s turn");
-        statusLabel.setLocation(HEIGTH, HEIGTH / 10);
-        statusLabel.setSize(200, 60);
-        statusLabel.setFont(new Font("Rockwell", Font.BOLD, 20));
-        add(statusLabel);
-    }
-
-    /**
-     * 在游戏面板中增加一个按钮，如果按下的话就会显示Hello, world!
-     */
 
     private void addHelloButton() {
         JButton button = new JButton("New Start");
@@ -151,13 +139,28 @@ public class ChessGameFrame extends JFrame {
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                time0 = 31;
                 dispose();
                 ChessGameFrame chessGameFrame = new ChessGameFrame(1000, 760);
-
                 chessGameFrame.setVisible(true);
             }
         });
         button.setLocation(HEIGTH, HEIGTH / 10 + 120);
+        button.setSize(200, 60);
+        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        add(button);
+    }
+
+    private void addBackButton() {
+        JButton button = new JButton("Back");
+
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                chessboard.back();
+            }
+        });
+        button.setLocation(HEIGTH, HEIGTH / 10 + 360);
         button.setSize(200, 60);
         button.setFont(new Font("Rockwell", Font.BOLD, 20));
         add(button);
@@ -173,6 +176,9 @@ public class ChessGameFrame extends JFrame {
         button.addActionListener(e -> {
             System.out.println("Click load");
             String path = JOptionPane.showInputDialog(this, "Input Path here");
+            if (path == null || path.isEmpty()) {
+                return;
+            }
             gameController.loadGameFromFile(path);
         });
     }
