@@ -1,13 +1,11 @@
 package model;
 
-import view.Chessboard;
 import view.ChessboardPoint;
 import controller.ClickController;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.List;
 
@@ -25,7 +23,7 @@ public abstract class ChessComponent extends JComponent {
      */
 
 //    private static final Dimension CHESSGRID_SIZE = new Dimension(1080 / 4 * 3 / 8, 1080 / 4 * 3 / 8);
-    public static Color[] BACKGROUND_COLORS = {Color.PINK, Color.getHSBColor(124,248,120)};
+    private static Color[] BACKGROUND_COLORS = {Color.PINK, Color.getHSBColor(124,248,120)};
 
     public static Color[] getBackgroundColors() {
         return BACKGROUND_COLORS;
@@ -52,11 +50,7 @@ public abstract class ChessComponent extends JComponent {
     protected final ChessColor chessColor;
     private boolean selected;
     private char name;
-    protected ChessComponent[][] chessboard;
 
-    public void setChessboard(ChessComponent[][] chessboard) {
-        this.chessboard = chessboard;
-    }
 
 
     @Override
@@ -117,6 +111,7 @@ public abstract class ChessComponent extends JComponent {
     @Override
     protected void processMouseEvent(MouseEvent e) {
         super.processMouseEvent(e);
+
         if (e.getID() == MouseEvent.MOUSE_PRESSED) {
             System.out.printf("Click [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
             clickController.onClick(this);
